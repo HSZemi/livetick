@@ -1,0 +1,5 @@
+AuthUserFile /var/www/livetick/.htpasswd
+AuthName "Protected"
+AuthType Basic
+
+Require user valid-user
