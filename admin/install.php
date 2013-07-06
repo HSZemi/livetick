@@ -61,6 +61,7 @@
  define("PREFIX", "'.$_POST['dbprefix'].'");
  define("BASEDIR", "'.$_POST['basedir'].'");
  define("PASSSALT", "'.$_POST['passsalt'].'");
+ define("EVENT", "'.$_POST['event'].'");
 ?>';
         
         fwrite($file, $filecontent);
@@ -77,6 +78,7 @@
         echo $_POST['dbprefix'] . '<br />';
         echo $_POST['basedir'] . '<br />';
         echo $_POST['passsalt'] . '<br />';
+        echo $_POST['event'] . '<br />';
         
         echo '<br />Installation wird gestartet...';
     } else {
@@ -89,6 +91,7 @@
             <p>Datenbank-Präfix<br /><input name="dbprefix" type="text" size="30" maxlength="120" value="livetick_" /></p>
             <p>Verzeichnis auf Webserver<br /><input name="basedir" type="text" size="30" maxlength="120" value="/livetick" /></p>
             <p>Passwort-Salt<br /><input name="passsalt" type="text" size="30" maxlength="120" value="d78ea1ad4c75af2123391fce7da0c374" /></p>
+            <p>Event<br /><input name="passsalt" type="text" size="30" maxlength="120" value="SP-Sitzung vom 01.01.1970" /></p>
             <button class="btn">Erstellen</button>
         </form>
         

@@ -17,7 +17,7 @@
     <script src="js/bootstrap.min.js"></script>
 
     <div class="container">
-        <?php include 'header.html' ?>
+        <?php include 'header.php' ?>
         
         
         <?php
