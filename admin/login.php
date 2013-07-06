@@ -54,16 +54,30 @@
   <div class="container top-buffer">
   
   <?php 
+
+  if(!$md5_err and !$login_err){
+    echo '<div class="span6 offset3 text-center"><span>&nbsp;</span><p>&nbsp;</p></div>'."\n";
+  }
   
   if($md5_err){
-    echo '<div class="span6 offset3"><span class="label label-important">Fehler: MD5 nicht verfügbar!</span></div>'."\n";
+    echo '<div class="span6 offset3"><span class="label label-important">Fehler: MD5 nicht verfügbar!</span><p>&nbsp;</p></div>'."\n";
   }
   if($login_err){
-    echo '<div class="span6 offset3"><span class="label label-important">Fehler: Benutzername und/oder Passwort ungültig.</span></div>'."\n";
+    echo '<div class="span6 offset3"><span class="label label-important">Fehler: Benutzername und/oder Passwort ungültig.</span><p>&nbsp;</p></div>'."\n";
   }
   
   ?>
     <div class="span6 offset3">
+    
+    <ul class="nav nav-pills">
+        <li class="active">
+        <a href="login.php">Login</a>
+        </li>
+        <li class="disabled"><a href="user.php">Benutzerverwaltung</a></li>
+        <li class="disabled"><a href="post.php">Post erstellen</a></li>
+        <li><a href="../index.php">Liveticker</a></li>
+    </ul>
+    
     <h1>Anmelden</h1>
     <form class="form-horizontal" action="login.php" method="post">
         <div class="control-group">

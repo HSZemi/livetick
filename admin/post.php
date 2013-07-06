@@ -57,7 +57,8 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
         <ul class="nav">
             <li class="active"><a href="post.php" target="_self"><i class="icon-pencil"></i> Beitrag erstellen</a></li>
             <li><a href="../index.php" target="_blank"><i class="icon-arrow-right"></i> Ticker ansehen</a></li>
-            <li><a href="logout.php" target="_self"><i class="icon-off"></i> Abmelden (<?php echo $_SESSION['user'] ?>)</a></li> 
+            <li><a href="user.php" target="_self"><i class="icon-user"></i> Benutzerverwaltung</a></li>
+            <li><a href="logout.php" target="_self"><i class="icon-off"></i> Abmelden (<?php echo $_SESSION['user'] ?>)</a></li>
             <li>
                 <form class="navbar-form pull-left input-prepend input-append">
                     <span class="add-on" style="margin-top:5px;">ID</span>

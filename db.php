@@ -60,7 +60,66 @@ function get_user_by_id($user_id){
     $row = mysql_fetch_array($result);
     $username = $row['username'];
     
-    return $username;
+    if(isset($row['username'])){
+        return $username;
+    } else {
+        return "";
+    }
+}
+
+function get_id_of_user($username){
+    $username = validate_string_for_mysql_html($username);
+    $query = "SELECT ID FROM ".PREFIX."users WHERE username LIKE '".$username."'";
+    $result = mysql_query($query) or die("get_id_of_user: Anfrage fehlgeschlagen: " . mysql_error());
+    $row = mysql_fetch_array($result);
+    $user_id = $row['ID'];
+    
+    if(isset($row['ID'])){
+        return intval($user_id);
+    } else {
+        return -1;
+    }
+}
+
+function create_or_update_user($user, $pass){
+    $user = validate_string_for_mysql_html($user);
+    $pass = validate_string_for_mysql_html($pass);
+    
+    if (CRYPT_MD5 == 1){
+        $pass = crypt($pass,"$1$".PASSSALT);
+        
+        $user_id = get_id_of_user($user);
+        
+        if($user_id >= 0){
+            $query = "UPDATE ".PREFIX."users SET password='".$pass."' WHERE ID=$user_id;";
+        } else {
+            $query = "INSERT INTO ".PREFIX."users(username, password) VALUES ('$user', '$pass');";
+        }
+        $result = mysql_query($query);
+        if(!$result){
+            echo "create_or_update_user: Anfrage fehlgeschlagen: " . mysql_error() . "<br/>";
+            return false;
+        }
+        return true;
+    } else {
+        echo "MD5 not available.\n<br>";
+        return false;
+    }
+}
+
+function delete_user($user, $pass){
+    if(user_login($user, $pass) > -1){
+        $user = validate_string_for_mysql_html($user);
+        $query = "DELETE FROM ".PREFIX."users WHERE username LIKE '".$user."'";
+        $result = mysql_query($query);
+        if(!$result){
+            echo "delete_user: Anfrage fehlgeschlagen: " . mysql_error() . "<br/>";
+            return false;
+        }
+        return true;
+    } else {
+        return false;
+    }
 }
 
 function validate_string_for_mysql_html($string){

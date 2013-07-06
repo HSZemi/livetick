@@ -34,6 +34,14 @@
         
         $result = mysql_query($query) or die("Anfrage fehlgeschlagen: " . mysql_error());
         
+        $query = "CREATE TABLE ".PREFIX."users (
+            ID              int           AUTO_INCREMENT PRIMARY KEY,
+            username        VARCHAR(255)  UNIQUE,
+            password        text
+        );";
+        
+        $result = mysql_query($query) or die("Anfrage fehlgeschlagen: " . mysql_error());
+        
         echo 'Installation abgeschlossen.<br /> Sie können die Seite nun schließen.';
 
     
