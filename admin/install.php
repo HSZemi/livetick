@@ -1,3 +1,4 @@
+<!DOCTYPE HTML>
 <html>
   <head>
     <title>livetick - Datenbank installieren</title>
@@ -27,7 +28,8 @@
         $query = "CREATE TABLE ".PREFIX."entries (
             ID              int         AUTO_INCREMENT PRIMARY KEY,
             timestamp       timestamp   DEFAULT NOW(),
-            content         text
+            content         text,
+            user            int         FOREIGN KEY REFERENCES ".PREFIX."users(ID)
         );";
         
         $result = mysql_query($query) or die("Anfrage fehlgeschlagen: " . mysql_error());
@@ -50,6 +52,7 @@
  define("DATABASE", "'.$_POST['dbname'].'");
  define("PREFIX", "'.$_POST['dbprefix'].'");
  define("BASEDIR", "'.$_POST['basedir'].'");
+ define("PASSSALT", "'.$_POST['passsalt'].'");
 ?>';
         
         fwrite($file, $filecontent);
@@ -65,6 +68,7 @@
         echo $_POST['dbname'] . '<br />';
         echo $_POST['dbprefix'] . '<br />';
         echo $_POST['basedir'] . '<br />';
+        echo $_POST['passsalt'] . '<br />';
         
         echo '<br />Installation wird gestartet...';
     } else {
@@ -76,6 +80,7 @@
             <p>Name der Datenbank<br /><input name="dbname" type="text" size="30" maxlength="120" value="livetickdb" /></p>
             <p>Datenbank-Präfix<br /><input name="dbprefix" type="text" size="30" maxlength="120" value="livetick_" /></p>
             <p>Verzeichnis auf Webserver<br /><input name="basedir" type="text" size="30" maxlength="120" value="/livetick" /></p>
+            <p>Passwort-Salt<br /><input name="passsalt" type="text" size="30" maxlength="120" value="d78ea1ad4c75af2123391fce7da0c374" /></p>
             <button class="btn">Erstellen</button>
         </form>
         
