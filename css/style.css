@@ -20,6 +20,10 @@ body {
     margin-top:100px; 
 }
 
+.accordion {
+      margin-bottom: 0px;
+}
+
 @media (min-width: 767px) {
     .post {
         max-width: 570px;

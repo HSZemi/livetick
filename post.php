@@ -17,14 +17,9 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
     <link rel="stylesheet" type="text/css" href="../css/style.css">
   </head>
   <body>
-  
-    <script src="../js/jquery-2.0.2.min.js"></script>
-    <script src="../js/bootstrap.min.js"></script>
 
   <?php
     include '../db.php';
-    
-    $conn = db_connect();
     
     //echo 'Hello '.$_SESSION['user'].' with ID '.$_SESSION['user_id']."!";
     
@@ -43,7 +38,7 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
     }
     
     if(isset($content)){
-        
+        $conn = db_connect();
         
         if(isset($id_p)){ // Post aktualisieren
             update_post($id_p, $content, $_SESSION['user_id']);
@@ -51,7 +46,7 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
             create_post($content, $_SESSION['user_id']);
         }
         
-       
+        db_close($conn);
     }
     
   ?>
@@ -61,7 +56,6 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
       <div class="navbar-inner">
         <ul class="nav">
             <li class="active"><a href="post.php" target="_self"><i class="icon-pencil"></i> Beitrag erstellen</a></li>
-            <li><a href="comments.php" target="_self"><i class="icon-comment"></i> Kommentare (<?php echo number_of_unapproved_comments(); ?>)</a></li>
             <li><a href="../index.php" target="_blank"><i class="icon-arrow-right"></i> Ticker ansehen</a></li>
             <li><a href="user.php" target="_self"><i class="icon-user"></i> Benutzerverwaltung</a></li>
             <li><a href="logout.php" target="_self"><i class="icon-off"></i> Abmelden (<?php echo $_SESSION['user'] ?>)</a></li>
@@ -127,11 +121,6 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
         ?>
     </div>
   <!-- End Posts -->
-  <script type="text/javascript">
-  $('.accordion-body').collapse('hide');
-  </script>
-  
-  <?php  db_close($conn); ?>
   
   
   </body>

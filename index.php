@@ -44,7 +44,7 @@
         <div class="span6"><hr /></div>
         
         ';
-            echo get_posts_since(0);
+            echo get_posts_since(0, false);
             
             echo '<div class="span12"><a name=bottom href="#top">Nach Oben ↑</a></div>';
         }
@@ -87,6 +87,9 @@
             }
             
         }
+        
+        // Kommentare
+        $('.accordion-body').collapse('hide');
         
         // ActiveX-Kram
         

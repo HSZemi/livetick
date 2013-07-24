@@ -33,8 +33,8 @@ function db_close($link){
 }
 
 function user_login($user, $pass){
-    $user = validate_string_for_mysql_html($user);
-    $pass = validate_string_for_mysql_html($pass);
+    $user = mysql_real_escape_string($user);
+    $pass = mysql_real_escape_string($pass);
     
     $query = "SELECT ID, password FROM ".PREFIX."users WHERE username LIKE '$user'";
     $result = mysql_query($query) or die("user_login: Anfrage fehlgeschlagen: " . mysql_error());
@@ -54,7 +54,7 @@ function user_login($user, $pass){
 }
 
 function get_user_by_id($user_id){
-    $user_id = validate_string_for_mysql_html($user_id);
+    $user_id = mysql_real_escape_string($user_id);
     $query = "SELECT username FROM ".PREFIX."users WHERE ID='$user_id'";
     $result = mysql_query($query) or die("get_user_by_id: Anfrage fehlgeschlagen: " . mysql_error());
     $row = mysql_fetch_array($result);
@@ -68,7 +68,7 @@ function get_user_by_id($user_id){
 }
 
 function get_id_of_user($username){
-    $username = validate_string_for_mysql_html($username);
+    $username = mysql_real_escape_string($username);
     $query = "SELECT ID FROM ".PREFIX."users WHERE username LIKE '".$username."'";
     $result = mysql_query($query) or die("get_id_of_user: Anfrage fehlgeschlagen: " . mysql_error());
     $row = mysql_fetch_array($result);
@@ -82,8 +82,8 @@ function get_id_of_user($username){
 }
 
 function create_or_update_user($user, $pass){
-    $user = validate_string_for_mysql_html($user);
-    $pass = validate_string_for_mysql_html($pass);
+    $user = mysql_real_escape_string($user);
+    $pass = mysql_real_escape_string($pass);
     
     if (CRYPT_MD5 == 1){
         $pass = crypt($pass,"$1$".PASSSALT);
@@ -109,7 +109,7 @@ function create_or_update_user($user, $pass){
 
 function delete_user($user, $pass){
     if(user_login($user, $pass) > -1){
-        $user = validate_string_for_mysql_html($user);
+        $user = mysql_real_escape_string($user);
         $query = "DELETE FROM ".PREFIX."users WHERE username LIKE '".$user."'";
         $result = mysql_query($query);
         if(!$result){
@@ -123,12 +123,12 @@ function delete_user($user, $pass){
 }
 
 function validate_string_for_mysql_html($string){
-      //return mysql_real_escape_string(htmlspecialchars($string, ENT_QUOTES | ENT_HTML401));
-	return mysql_real_escape_string($string);
+      return mysql_real_escape_string(htmlspecialchars($string, ENT_QUOTES | ENT_HTML401));
+	//return mysql_real_escape_string($string);
 }
 
 function create_post($content, $user_id){
-    $content = validate_string_for_mysql_html($content);
+    $content = mysql_real_escape_string($content);
     $user_id = intval($user_id);
 
     $query = "INSERT INTO ".PREFIX."entries(content, user) VALUES ('$content', $user_id);";
@@ -138,9 +138,33 @@ function create_post($content, $user_id){
       }
 }
 
+function create_comment($ip, $email, $username, $content, $entry){
+    $ip = validate_string_for_mysql_html($ip);
+    $email = validate_string_for_mysql_html($email);
+    $username = validate_string_for_mysql_html($username);
+    $content = validate_string_for_mysql_html($content);
+    $entry = intval($entry);
+
+    $query = "INSERT INTO ".PREFIX."comments(ip, email, username, content, entry) VALUES ('$ip', '$email', '$username', '$content', $entry);";
+      $result = mysql_query($query);
+      if(!$result){
+            echo "create_comment: Anfrage fehlgeschlagen: " . mysql_error() . "<br/>";
+      }
+}
+
+function approve_comment($comment_id, $state = 1){
+      $comment_id = intval($comment_id);
+      $state = intval($state);
+      $query = "UPDATE ".PREFIX."comments SET approved=$state WHERE ID=$comment_id;";
+      $result = mysql_query($query);
+      if(!$result){
+            echo "approve_comment: Anfrage fehlgeschlagen: " . mysql_error() . "<br/>";
+      }
+}
+
 function update_post($id, $content, $user_id){
     $id = intval($id);
-    $content = validate_string_for_mysql_html($content);
+    $content = mysql_real_escape_string($content);
     $user_id = intval($user_id);
     
     $query = "UPDATE ".PREFIX."entries SET content='$content', user=$user_id WHERE ID=$id;";
@@ -168,7 +192,173 @@ function get_post_content_with_id($id){
       mysql_free_result($result);
 }
 
-function get_post_with_id($id){
+function number_of_comments($post_id, $admin=false){
+      $post_id = intval($post_id);
+      
+      $query = "SELECT COUNT(ID) AS count
+            FROM ".PREFIX."comments
+            WHERE entry=$post_id";
+            
+      if(!$admin){
+            $query .= " AND approved=1";
+      }
+      
+      $query .= ";";
+      
+      $result = mysql_query($query) or die("number_of_comments: Anfrage fehlgeschlagen: " . mysql_error());
+      $row = mysql_fetch_array($result);
+      mysql_free_result($result);
+      return intval($row['count']);
+}
+
+function number_of_unapproved_comments(){
+      $query = "SELECT COUNT(ID) AS count
+            FROM ".PREFIX."comments
+            WHERE approved=0;";
+
+      $result = mysql_query($query) or die("number_of_unapproved_comments: Anfrage fehlgeschlagen: " . mysql_error());
+      $row = mysql_fetch_array($result);
+      mysql_free_result($result);
+      return intval($row['count']);
+}
+
+
+function print_post($id, $username, $timestamp, $content, $admin = false, $comments = false){
+      // bugfix for wrong server time
+      $date = date_create($timestamp);
+      $time = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "H:i");
+      $fulltime = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "Y-m-d H:i:s");
+            
+      // if in admin interface show edit link
+      $editlink = $admin ? " <a href=\"" . BASEDIR . "/admin/post.php?modify=$id\" title=\"edit\"><i class=\"icon-pencil\"></i></a> " : "";
+            
+      echo '<div class="span12 post">
+      <p><a href="'.BASEDIR.'/index.php?id='.$id.'">
+      <span class="badge badge-info">'.$id.'</span>
+      </a> 
+      <b><abbr title="'.$fulltime.'">'.$time.'</abbr></b>
+      <span class="label text-right">'.$username.'</span>'.$editlink.'</p>
+                
+      '.br($content).'
+      
+      ';
+      
+      if($comments){
+            print_comments($id, $admin);
+      }
+      
+      
+                
+       echo '</div>
+       ';
+}
+
+function print_comments($post_id, $admin = false){
+      // HTML output
+       echo '<div class="accordion" id="comments-'.intval($post_id).'">
+       <div class="accordion-group comments">
+         <div class="accordion-heading text-right">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#comments-'.intval($post_id).'" href="#collapse-'.intval($post_id).'">
+            Kommentare ('.number_of_comments($post_id, $admin).')
+          </a>
+         </div>
+         <div id="collapse-'.intval($post_id).'" class="accordion-body">
+          <div class="accordion-inner">
+          ';
+      
+      $query = "SELECT *
+            FROM ".PREFIX."comments
+            WHERE entry = " . intval($post_id);
+      $result = mysql_query($query) or die("print_comments: Anfrage fehlgeschlagen: " . mysql_error());
+      
+
+      while($row = mysql_fetch_array($result)){
+            $comment_id = $row['ID'];
+            $timestamp  = $row['timestamp'];
+            $ip         = $row['ip'];
+            $email      = $row['email'];
+            $username   = $row['username'];
+            $content    = $row['content'];
+            $approved   = $row['approved'];
+            
+            print_single_comment($comment_id, $timestamp, $username, $content, $admin, $approved, $ip, $email);
+            
+      }
+      
+      echo '</div>
+      <p class="text-right"><a href="'.BASEDIR.'/writecomment.php?id='.$post_id.'" title="Kommentar verfassen">Kommentar verfassen</a></p>
+      </div>
+</div>
+</div>';
+
+      mysql_free_result($result);
+
+}
+
+function print_single_comment($comment_id, $timestamp, $username, $content, $admin, $approved, $ip, $email){
+      $date = date_create($timestamp);
+      $time = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "H:i");
+      $fulltime = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "Y-m-d H:i:s");
+      
+      if($approved != '1'){
+            $approved = false;
+      } else {
+            $approved = true;
+      }
+      
+      if($admin){
+            $toprow = "<span class='badge'>$comment_id</span>
+                       <span class='label'>$username</span>
+                       <abbr title='$fulltime'>$time</abbr>
+                       <span class='badge'>$ip</span>
+                       <span class='badge'>$email</span>";
+      } else {
+            $toprow = "<span class='label'>$username</span>
+                       <abbr title='$fulltime'>$time</abbr>";
+      }
+
+      
+      if($admin and !$approved){
+            echo "<p><span class='text-warning'>" . $toprow . "</span><br/>\n";
+            echo br($content)."</p>\n";
+      } elseif($approved){
+            echo "<p>".$toprow . "<br/>\n";
+            echo br($content)."</p>\n";
+      }
+}
+
+function list_of_comments($approved = 'all'){
+      $query = "SELECT * FROM ".PREFIX."comments";
+            
+      if($approved == 1 or $approved == 0){
+            $query .= " WHERE approved=".$approved;
+      }
+      
+      $query .= " ORDER BY ID DESC;;";
+      
+      $result = mysql_query($query) or die("list_of_comments: Anfrage fehlgeschlagen: " . mysql_error());
+      
+      while($row = mysql_fetch_array($result)){
+            $comment_id = $row['ID'];
+            $timestamp  = $row['timestamp'];
+            $ip         = $row['ip'];
+            $email      = $row['email'];
+            $username   = $row['username'];
+            $content    = $row['content'];
+            $approved   = $row['approved'];
+            
+            if(intval($approved) == 0){
+                  echo "<hr /><i class='icon-arrow-down'></i> <a href='approvecomment.php?approveid=$comment_id' title='Kommentar $comment_id genehmigen'>genehmigen</a>\n";
+            } else {
+                  echo "<hr /><i class='icon-arrow-down'></i> <a href='approvecomment.php?disapproveid=$comment_id' title='Genehmigung widerrufen (Kommentar $comment_id)'>widerrufen</a>\n";
+            }
+            print_single_comment($comment_id, $timestamp, $username, $content, true, $approved, $ip, $email);
+            
+      }
+      
+}
+
+function get_post_with_id($id, $admin = false){
 
     $id = intval($id);
 
@@ -189,22 +379,7 @@ function get_post_with_id($id){
             //$fulltime = date_format(date_create($timestamp), "Y-m-d H:i:s");
             $username = get_user_by_id($user);
             
-            // bugfix for wrong server time
-            $date = date_create($timestamp);
-            $time = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "H:i");
-            $fulltime = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "Y-m-d H:i:s");
-            
-            echo '<div class="span12 post">
-                <p><a href="'.BASEDIR.'/index.php?id='.$id.'">
-                    <span class="badge badge-info">'.$id.'</span>
-                </a> 
-                <b><abbr title="'.$fulltime.'">'.$time.'</abbr></b> 
-                <span class="label">'.$username.'</span></p>
-                
-                '.br($content).'
-                
-                </div>
-                ';
+            print_post($id, $username, $timestamp, $content, $admin, true);
       }
 
       mysql_free_result($result);
@@ -232,25 +407,7 @@ function get_last_posts($count, $admin){
             //$fulltime = date_format(date_create($timestamp), "Y-m-d H:i:s");
             $username = get_user_by_id($user);
             
-            // bugfix for wrong server time
-            $date = date_create($timestamp);
-            $time = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "H:i");
-            $fulltime = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "Y-m-d H:i:s");
-            
-            // if in admin interface show edit link
-            $editlink = $admin ? " <a href=\"" . BASEDIR . "/admin/post.php?modify=$id\" title=\"edit\"><i class=\"icon-pencil\"></i></a> " : "";
-            
-            echo '<div class="span12 post">
-                <p><a href="'.BASEDIR.'/index.php?id='.$id.'">
-                    <span class="badge badge-info">'.$id.'</span>
-                </a> 
-                <b><abbr title="'.$fulltime.'">'.$time.'</abbr></b>
-                <span class="label text-right">'.$username.'</span>'.$editlink.'</p>
-                
-                '.br($content).'
-                
-                </div>
-                ';
+            print_post($id, $username, $timestamp, $content, $admin, true);
       }
 
       mysql_free_result($result);
@@ -262,7 +419,7 @@ function get_posts_since_with_max_id($id){
     get_posts_since($id);
 }
 
-function get_posts_since($id){
+function get_posts_since($id, $admin = false){
     $id = intval($id);
 
     $query = "SELECT *
@@ -285,22 +442,7 @@ function get_posts_since($id){
             //$fulltime = date_format(date_create($timestamp), "Y-m-d H:i:s");
             $username = get_user_by_id($user);
             
-            // bugfix for wrong server time
-            $date = date_create($timestamp);
-            $time = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "H:i");
-            $fulltime = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "Y-m-d H:i:s");
-            
-            echo '<div class="span12 post">
-            <p><a href="'.BASEDIR.'/index.php?id='.$id.'">
-                <span class="badge badge-info">'.$id.'</span>
-            </a> 
-            <b><abbr title="'.$fulltime.'">'.$time.'</abbr></b> 
-            <span class="label">'.$username.'</span> </p>
-            
-            '.br($content).'
-            
-            </div>
-            ';
+            print_post($id, $username, $timestamp, $content, $admin, true);
       }
 
       mysql_free_result($result);

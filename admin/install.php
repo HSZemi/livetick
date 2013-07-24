@@ -38,6 +38,20 @@
         
         $result = mysql_query($query) or die("Anfrage fehlgeschlagen: " . mysql_error());
         
+        echo 'Erstelle Tabelle für Kommentare <br />';
+        $query = "CREATE TABLE ".PREFIX."comments (
+            ID              int         AUTO_INCREMENT PRIMARY KEY,
+            timestamp       timestamp   DEFAULT NOW(),
+            ip              text,
+            email           text,
+            username        text,
+            content         text,
+            entry           int         REFERENCES ".PREFIX."entries(ID),
+            approved        int         DEFAULT 0
+        );";
+        
+        $result = mysql_query($query) or die("Anfrage fehlgeschlagen: " . mysql_error());
+        
         echo 'Erstelle Tabelle für Benutzer <br />';
         $query = "CREATE TABLE ".PREFIX."users (
             ID              int           AUTO_INCREMENT PRIMARY KEY,
