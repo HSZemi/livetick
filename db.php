@@ -390,7 +390,7 @@ function list_last_comments($count, $admin = false){
       if(!$admin){
             $query .= " WHERE approved = 1";
       }
-      $query .= " ORDER BY ID LIMIT " . intval($count);
+      $query .= " ORDER BY ID DESC LIMIT " . intval($count);
       
       $result = mysql_query($query) or die("get_last_posts: Anfrage fehlgeschlagen: " . mysql_error());
       
