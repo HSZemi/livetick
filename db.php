@@ -227,7 +227,7 @@ function print_post($id, $username, $timestamp, $content, $admin = false, $comme
       // bugfix for wrong server time
       $date = date_create($timestamp);
       $time = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "H:i");
-      $fulltime = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "Y-m-d H:i:s");
+      $fulltime = date_format($date, "Y-m-d H:i:s");
             
       // if in admin interface show edit link
       $editlink = $admin ? " <a href=\"" . BASEDIR . "/admin/post.php?modify=$id\" title=\"edit\"><i class=\"icon-pencil\"></i></a> " : "";
@@ -298,7 +298,7 @@ function print_comments($post_id, $admin = false){
 function print_single_comment($comment_id, $timestamp, $username, $content, $admin, $approved, $ip, $email){
       $date = date_create($timestamp);
       $time = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "H:i");
-      $fulltime = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "Y-m-d H:i:s");
+      $fulltime = date_format($date, "Y-m-d H:i:s");
       
       if($approved != '1'){
             $approved = false;
@@ -383,6 +383,38 @@ function get_post_with_id($id, $admin = false){
       }
 
       mysql_free_result($result);
+}
+
+function list_last_comments($count, $admin = false){
+      $query = "SELECT * FROM ".PREFIX."comments";
+      if(!$admin){
+            $query .= " WHERE approved = 1";
+      }
+      $query .= " ORDER BY ID LIMIT " . intval($count);
+      
+      $result = mysql_query($query) or die("get_last_posts: Anfrage fehlgeschlagen: " . mysql_error());
+      
+      // HTML output
+
+      while($row = mysql_fetch_array($result)){
+            $id         = $row['ID'];
+            $timestamp  = $row['timestamp'];
+            $content    = $row['ip'];
+            $email      = $row['email'];
+            $username   = $row['username'];
+            $content    = $row['content'];
+            $entry      = $row['entry'];
+            $approved   = $row['approved'];
+            
+            // bugfix for wrong server time
+            $date = date_create($timestamp);
+            $time = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "H:i");
+            $fulltime = date_format($date, "Y-m-d H:i:s");
+            
+            ($admin) ? $class = "text-warning" : $class = "";
+            
+            echo "<p class='$class'>$username zu <a href='".BASEDIR."/index.php?id=$entry'>#$entry</a> um <abbr title='$fulltime'>$time Uhr</abbr></p>\n";
+      }
 }
 
 

@@ -39,9 +39,15 @@
         
         </div>
         
+        <div id="latest_comments" class="pull-right well hidden-phone">
+        <h4>Letzte Kommentare:</h4>';
+        list_last_comments(20, false);
+        echo '</div>
+        
         <div id="updates" style="border:none; background-color: none;"> </div>
         
         <div class="span6"><hr /></div>
+
         
         ';
             echo get_posts_since(0, false);
