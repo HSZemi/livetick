@@ -76,71 +76,39 @@
         var refresh_auto = window.setInterval("loadContent()", refresh_interval);
         
         // Buttons
-        document.getElementById("b_load").onclick = function () {
+        $("#b_load").click( function () {
             loadContent();
-        }
+        });
         
-        document.getElementById("b_toggle_auto").onclick = function () {
+        $("#b_toggle_auto").click( function () {
             if (refresh) {
                 window.clearInterval(refresh_auto);
-                document.getElementById("b_toggle_auto").childNodes[0].nodeValue = "Automatische Aktualisierung: AUS";
+                $("#b_toggle_auto").html("Automatische Aktualisierung: AUS");
                 $("#b_toggle_auto").removeClass("btn-primary");
                 refresh = false;
             } else {
                 window.setInterval("loadContent()", refresh_interval);
-                document.getElementById("b_toggle_auto").childNodes[0].nodeValue = "Automatische Aktualisierung: AN";
+                $("#b_toggle_auto").html("Automatische Aktualisierung: AN");
                 $("#b_toggle_auto").addClass("btn-primary");
                 refresh = true;
             }
             
-        }
+        });
         
         // Kommentare
         $('.accordion-body').collapse('hide');
         
-        // ActiveX-Kram
-        
-        if (typeof XMLHttpRequest != 'undefined') 
-        {
-            xmlHttpObject = new XMLHttpRequest();
-        }
-        if (!xmlHttpObject) 
-        {
-            try 
-            {
-                xmlHttpObject = new ActiveXObject("Msxml2.XMLHTTP");
-            }
-            catch(e) 
-            {
-                try 
-                {
-                    xmlHttpObject = new ActiveXObject("Microsoft.XMLHTTP");
-                }
-                catch(e) 
-                {
-                    xmlHttpObject = null;
-                }
-            }
-        }
 
         function loadContent()
         {
-            xmlHttpObject.open('get','getpostssince.php?id=' + last_post_id);
-            xmlHttpObject.onreadystatechange = handleContent;
-            xmlHttpObject.send(null);
-            return false;
+            $.get('getpostssince.php?id=' + last_post_id, function(data) {
+                  var new_max = data.split("\n", 1);
+                  last_post_id = parseInt(new_max[0]);
+                  $('#updates').prepend(data.slice(new_max[0].length + 1));
+            });
         }
 
-        function handleContent()
-        {
-            if (xmlHttpObject.readyState == 4)
-            {
-                //document.getElementById('updates').innerHTML = xmlHttpObject.responseText;
-                var new_max = xmlHttpObject.responseText.split("\n", 1);
-                last_post_id = parseInt(new_max[0]);
-                $('#updates').prepend(xmlHttpObject.responseText.slice(new_max[0].length + 1));
-            }
-        }
+        
 
     </script>
   
