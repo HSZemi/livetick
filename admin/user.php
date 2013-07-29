@@ -9,6 +9,7 @@
     $md5_err = false;
     $updated = false;
     $user_pass_problem = false;
+    $user_privilegue_error = false;
     
     if(isset($_POST['user']) and isset($_POST['pass'])){
         $user = $_POST['user'];
@@ -20,7 +21,11 @@
 
             if (CRYPT_MD5 == 1){
                 if(isset($_POST['create_update'])){
-                    $updated = create_or_update_user($user, $pass);
+                    if((get_id_of_user($user) != $_SESSION['user_id']) and (get_userlevel() < 3)){
+                        $user_privilegue_error = true;
+                    } else {
+                        $updated = create_or_update_user($user, $pass);
+                    }
                 } elseif(isset($_POST['delete'])){
                     $deleted = delete_user($user, $pass);
                 }
@@ -59,6 +64,9 @@
   }
   if($user_pass_problem){
     echo '<div class="span6 offset3 text-center"><span class="label label-warning">Fehler: Benutzername und/oder Passwort ungültig.</span><p>&nbsp;</p></div>'."\n";
+  }
+  if($user_privilegue_error){
+    echo '<div class="span6 offset3 text-center"><span class="label label-important">Fehler: Nur Administratoren dürfen Benutzer anlegen und Passwörter anderer Benutzer ändern.</span><p>&nbsp;</p></div>'."\n";
   }
   if($updated){
     echo '<div class="span6 offset3 text-center"><span class="label label-success">Benutzer '.$user.' aktualisiert.</span><p>&nbsp;</p></div>'."\n";

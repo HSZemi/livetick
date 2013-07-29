@@ -56,7 +56,8 @@
         $query = "CREATE TABLE ".PREFIX."users (
             ID              int           AUTO_INCREMENT PRIMARY KEY,
             username        VARCHAR(255)  UNIQUE,
-            password        text
+            password        text,
+            userlevel       int           DEFAULT 0
         );";
         
         $result = mysql_query($query) or die("Anfrage fehlgeschlagen: " . mysql_error());
