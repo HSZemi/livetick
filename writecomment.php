@@ -62,7 +62,7 @@
         if(isset($_GET['id'])){
                 $singleid = $_GET['id'];
                 echo "<hr /><br />\n";
-                echo get_post_with_id($singleid);
+                echo print_single_post($singleid);
                 
                 ?>
       

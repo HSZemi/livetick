@@ -59,6 +59,18 @@ function number_of_unapproved_comments(){
       return intval($row['count']);
 }
 
+// return ID of last approved comment
+function last_approved_comment_id(){
+      $query = "SELECT MAX(ID) AS max
+            FROM ".PREFIX."comments
+            WHERE approved=1;";
+
+      $result = mysql_query($query) or die("last_approved_comment_id: Anfrage fehlgeschlagen: " . mysql_error());
+      $row = mysql_fetch_array($result);
+      mysql_free_result($result);
+      return intval($row['max']);
+}
+
 // print comment div for a certain post
 function print_comments($post_id, $admin = false){
       // HTML output

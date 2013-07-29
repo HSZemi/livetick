@@ -64,11 +64,10 @@
     </div>
   
   
-  
+  <?php if(!isset($_GET['id'])){ ?>
     <script type="text/javascript">
         var last_post_id = <?php $conn = db_connect();echo max_post_id();db_close($conn); ?>;
-
-        var xmlHttpObject = false;
+        var last_comment_id = <?php $conn = db_connect();echo last_approved_comment_id();db_close($conn); ?>;
         
         var refresh_interval = 20000;
         
@@ -106,11 +105,20 @@
                   last_post_id = parseInt(new_max[0]);
                   $('#updates').prepend(data.slice(new_max[0].length + 1));
             });
+            $.get('lastcomments.php?id=' + last_comment_id, function(data) {
+                  if(!(data=="")){
+                        var new_max = data.split("\n", 1);
+                        last_comment_id = parseInt(new_max[0]);
+                        $('#latest_comments').html('<h4>Letzte Kommentare:</h4>' + data.slice(new_max[0].length + 1));
+                  }
+            });
         }
 
         
 
     </script>
+    
+    <?php } ?>
   
  </body>
 </html>
