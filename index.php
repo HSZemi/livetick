@@ -22,14 +22,15 @@
         
         <?php
         
-        include 'db.php';
+        include 'lib/db.php';
+        include 'lib/post-mgmt.php';
         
         $conn = db_connect();
         
         if(isset($_GET['id'])){
                 $singleid = $_GET['id'];
                 echo "<hr /><br />\n";
-                echo get_post_with_id($singleid);
+                echo print_single_post($singleid);
         } else {
             echo '<div id="options">
 
@@ -41,7 +42,7 @@
         
         <div id="latest_comments" class="pull-right well">
         <h4>Letzte Kommentare:</h4>';
-        list_last_comments(20, false);
+        print_list_of_last_comments(20, false);
         echo '</div>
         
         <div id="updates" style="border:none; background-color: none;"> </div>
@@ -50,7 +51,7 @@
 
         
         ';
-            echo get_posts_since(0, false);
+            echo print_posts_since(0, false);
             
             echo '<div class="span12"><a name=bottom href="#top">Nach Oben ↑</a></div>';
         }
@@ -65,7 +66,7 @@
   
   
     <script type="text/javascript">
-        var last_post_id = <?php $conn = db_connect();echo max_id();db_close($conn); ?>;
+        var last_post_id = <?php $conn = db_connect();echo max_post_id();db_close($conn); ?>;
 
         var xmlHttpObject = false;
         

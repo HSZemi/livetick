@@ -14,9 +14,10 @@
   <?php
   
   
-    if(is_readable('../config.php') or file_exists('../config.php')){ // install
+    if(is_readable('../lib/config.php') or file_exists('../lib/config.php')){ // install
     
-        include '../db.php';
+        include '../lib/db.php';
+        include '../lib/user-mgmt.php';
 
     
         $conn = db_connect();
@@ -73,7 +74,7 @@
     } elseif(isset($_POST['dbuser'], $_POST['dbpass'], $_POST['dbname'], $_POST['dbprefix'], $_POST['dbprefix'], $_POST['basedir'])) { // create file 
 
         
-        $file = fopen('../config.php', 'w');
+        $file = fopen('../lib/config.php', 'w');
         
         if($file){
         

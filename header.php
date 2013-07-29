@@ -1,5 +1,5 @@
 <?php
-include 'config.php';
+include 'lib/config.php';
 ?>
 <div id="header">
     <h4>livetick - simple liveticker application</h4>

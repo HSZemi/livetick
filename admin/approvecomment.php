@@ -1,7 +1,8 @@
 <?php
 session_start();
 
-include '../db.php';
+include '../lib/db.php';
+include '../lib/comment-mgmt.php';
 
 $conn = db_connect();
 

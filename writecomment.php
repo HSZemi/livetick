@@ -22,7 +22,8 @@
         
         <?php
         
-        include 'db.php';
+        include 'lib/db.php';
+        include 'lib/post-mgmt.php';
         
         $conn = db_connect();
         

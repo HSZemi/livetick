@@ -1,5 +1,6 @@
 <?php
-    include '../db.php';
+    include '../lib/db.php';
+    include '../lib/user-mgmt.php';
 
     session_start();
     

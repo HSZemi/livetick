@@ -22,7 +22,8 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
     <script src="../js/bootstrap.min.js"></script>
 
   <?php
-    include '../db.php';
+    include '../lib/db.php';
+    include '../lib/post-mgmt.php';
     
     $conn = db_connect();
     
@@ -46,7 +47,7 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
         
         
         if(isset($id_p)){ // Post aktualisieren
-            update_post($id_p, $content, $_SESSION['user_id']);
+            update_post($id_p, $content);
         } else {          // neuen Post erstellen
             create_post($content, $_SESSION['user_id']);
         }
@@ -97,9 +98,9 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
 
                     echo '<textarea class="span11" cols="100" rows="10" name="textfeld" autofocus>';  
                     if(isset($modify_id)){
-                        $conn = db_connect();
-                        get_post_content_with_id($modify_id);
-                        db_close($conn);
+                        
+                        print_post_content_with_id($modify_id);
+                        
                     }
                     echo '</textarea>';
                 ?>
@@ -118,12 +119,8 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
     <div class="span6 offset1">  
         <?php
         
-            $conn = db_connect();
-            
-            get_last_posts(100, true);
-            
-            db_close($conn);
-                
+            print_latest_posts(100, true);
+          
         ?>
     </div>
   <!-- End Posts -->

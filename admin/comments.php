@@ -19,9 +19,9 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
   <body>
 
   <?php
-    include '../db.php';
-    
-    //echo 'Hello '.$_SESSION['user'].' with ID '.$_SESSION['user_id']."!";
+    include '../lib/db.php';
+    include '../lib/comment-mgmt.php';
+
     
     $conn = db_connect();
     
@@ -65,14 +65,14 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
 
         <div class="span6" id="commentsarea">
         <h2>Nicht genehmigte Kommentare</h2>
-           <?php list_of_comments(0); ?>
+           <?php print_list_of_comments(0); ?>
         </div>
 
   
   <!-- Approved comments -->
     <div class="span6"> 
         <h2>Genehmigte Kommentare</h2>
-        <?php list_of_comments(1); ?>
+        <?php print_list_of_comments(1); ?>
     </div>
     </div>
   <!-- End Approved comments -->

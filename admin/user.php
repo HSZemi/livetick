@@ -4,10 +4,12 @@
     if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
         header("Location: login.php");
     }
-    include '../db.php';
+    include '../lib/db.php';
+    include '../lib/user-mgmt.php';
 
     $md5_err = false;
     $updated = false;
+    $deleted = false;
     $user_pass_problem = false;
     $user_privilegue_error = false;
     
