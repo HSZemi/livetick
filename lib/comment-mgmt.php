@@ -8,7 +8,7 @@ function create_comment($ip, $email, $username, $content, $entry){
     $content = validate_string_for_mysql_html($content);
     $entry = intval($entry);
 
-    $query = "INSERT INTO ".PREFIX."comments(ip, email, username, content, entry) VALUES ('$ip', '$email', '$username', '$content', $entry);";
+    $query = "INSERT INTO ".PREFIX."comments(ip, email, username, content, entry, approved) VALUES ('$ip', '$email', '$username', '$content', $entry, 1);";
       $result = mysql_query($query);
       if(!$result){
             echo "create_comment: Anfrage fehlgeschlagen: " . mysql_error() . "<br/>";

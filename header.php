@@ -8,6 +8,6 @@ include 'lib/config.php';
     
     <h5><?php echo EVENT ?></h5>
     
-    <span class="b">Twitter: <a href="https://twitter.com/oeffref" target="_blank" alt="@oeffref auf Twitter">@oeffref</a></span> | <a href="archiv/index.html" alt="Archiv">Alte Liveticker</a>
+    <span class="b">Twitter: <a href="https://twitter.com/oeffref" target="_blank" title="@oeffref auf Twitter">@oeffref</a></span> | <a href="<?php echo BASEDIR; ?>/archiv/index.html" title="Archiv">Alte Liveticker</a><span class="visible-phone"><a href="<?php echo BASEDIR; ?>/comments.php" title="Letzte Kommentare">Letzte Kommentare</a></span>
 </div>
 

@@ -40,7 +40,7 @@
         
         </div>
         
-        <div id="latest_comments" class="pull-right well">
+        <div id="latest_comments" class="pull-right well hidden-phone">
         <h4>Letzte Kommentare:</h4>';
         print_list_of_last_comments(20, false);
         echo '</div>
@@ -51,7 +51,7 @@
 
         
         ';
-            echo print_posts_since(0, false);
+            echo print_posts_since(298, false);
             
             echo '<div class="span12"><a name=bottom href="#top">Nach Oben ↑</a></div>';
         }
