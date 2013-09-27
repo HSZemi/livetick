@@ -24,8 +24,11 @@
         
         include 'lib/db.php';
         include 'lib/post-mgmt.php';
+        include 'lib/statistics.php';
         
         $conn = db_connect();
+        
+        register_visit($_SERVER['REMOTE_ADDR']);
         
         echo ' <div id="latest_comments" class="well">
         <h4>Letzte Kommentare:</h4>';

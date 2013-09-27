@@ -9,19 +9,23 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
 <!DOCTYPE HTML>
 <html>
   <head>
-    <title>livetick - Post erstellen</title>
+    <title>livetick - Statistik</title>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <meta content="">
     <link href="../css/bootstrap.css" rel="stylesheet" media="screen">
     <link href="../css/bootstrap-responsive.css" rel="stylesheet">
     
     <link rel="stylesheet" type="text/css" href="../css/style.css">
+    
+    <script src="../js/Chart.js"></script>
+    <script src="../js/jquery-2.0.2.min.js"></script>
   </head>
   <body>
 
   <?php
     include '../lib/db.php';
     include '../lib/comment-mgmt.php';
+    include '../lib/statistics.php';
 
     
     $conn = db_connect();
@@ -33,10 +37,10 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
       <div class="navbar-inner">
         <ul class="nav">
             <li><a href="post.php" target="_self"><i class="icon-pencil"></i> Beitrag erstellen</a></li>
-            <li class="active"><a href="comments.php" target="_self"><i class="icon-comment"></i> Kommentare (<?php echo number_of_unapproved_comments(); ?>)</a></li>
+            <li><a href="comments.php" target="_self"><i class="icon-comment"></i> Kommentare (<?php echo number_of_unapproved_comments(); ?>)</a></li>
             <li><a href="../index.php" target="_blank"><i class="icon-arrow-right"></i> Ticker ansehen</a></li>
             <li><a href="user.php" target="_self"><i class="icon-user"></i> Benutzerverwaltung</a></li>
-            <li><a href="stats.php" target="_self"><i class="icon-align-left"></i> Statistik</a></li>
+            <li class="active"><a href="stats.php" target="_self"><i class="icon-align-left"></i> Statistik</a></li>
             <li><a href="logout.php" target="_self"><i class="icon-off"></i> Abmelden (<?php echo $_SESSION['user'] ?>)</a></li>
             <li>
                 <form class="navbar-form pull-left input-prepend input-append">
@@ -54,30 +58,29 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
   <div class="container" id="adminpagecontent">
   
   
-  <div class="span6" id="commentsarea">
-  <?php 
-      if(isset($_GET['approved'])){
-            echo '<div class="alert alert-success">Kommentar '.$_GET['approved'].' genehmigt.</div>';
-      }
-      if(isset($_GET['disapproved'])){
-            echo '<div class="alert">Kommentar '.$_GET['disapproved'].' zurückgezogen.</div>';
-      }
-  ?>
-  </div>
-
-        <div class="span6" id="commentsarea">
-        <h2>Nicht genehmigte Kommentare</h2>
-           <?php print_list_of_comments(0); ?>
-        </div>
-
+  <div class="span6" id="statsarea">
   
-  <!-- Approved comments -->
-    <div class="span6"> 
-        <h2>Genehmigte Kommentare</h2>
-        <?php print_list_of_comments(1); ?>
-    </div>
-    </div>
-  <!-- End Approved comments -->
+  <h2>Posts</h2>
+  <p>Es wurden <b><?php echo get_number_of_posts(); ?> Posts</b> geschrieben.</p>
+  <?php print_table_posts_per_user(); ?>
+  
+  <h2>Kommentare</h2>
+  <p>Es wurden <b><?php  echo get_number_of_comments(); ?> Kommentare</b> geschrieben.</p>
+  <?php print_table_comments_per_name(); ?>
+  
+  
+  <h2>Besucher</h2>
+  <p>In den letzten 10 Minuten <?php $count = get_current_number_of_visitors(); $count == 1 ? $out = "war <b>$count" : $out = "waren <b>$count"; echo $out; ?> Besucher</b> aktiv.</p>
+  
+  </div>
+  <div class="span12" id="chartarea">
+	<h3>Letzte Stunde</h3>
+	<?php print_visitor_chart(1, 1); ?>
+	
+	<h3>Letzte 6 Stunden</h3>
+	<?php print_visitor_chart(2, 6); ?>
+  </div>
+  </div>
   
   <?php db_close($conn); ?>
   

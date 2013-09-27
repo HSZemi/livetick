@@ -24,6 +24,7 @@
         
         include 'lib/db.php';
         include 'lib/post-mgmt.php';
+        include 'lib/statistics.php';
         
         $conn = db_connect();
         
@@ -31,6 +32,7 @@
                 $singleid = $_GET['id'];
                 echo "<hr /><br />\n";
                 echo print_single_post($singleid);
+                register_visit($_SERVER['REMOTE_ADDR']);
         } else {
             echo '<div id="options">
 
@@ -51,7 +53,7 @@
 
         
         ';
-            echo print_posts_since(298, false);
+            echo print_posts_since(0, false);
             
             echo '<div class="span12"><a name=bottom href="#top">Nach Oben ↑</a></div>';
         }

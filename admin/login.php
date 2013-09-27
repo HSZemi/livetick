@@ -29,6 +29,8 @@
             $_SESSION['user_id'] = $user_id;
             
             header("Location: post.php?login=true");
+            db_close($conn);
+            die();
             
         } else {
             $login_err = true;

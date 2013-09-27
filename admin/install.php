@@ -53,6 +53,15 @@
         
         $result = mysql_query($query) or die("Anfrage fehlgeschlagen: " . mysql_error());
         
+        echo 'Erstelle Tabelle für Besuche <br />';
+        $query = "CREATE TABLE ".PREFIX."visits (
+            ID              int           AUTO_INCREMENT PRIMARY KEY,
+            visitor         VARCHAR(255),
+            timestamp       timestamp
+        );";
+        
+        $result = mysql_query($query) or die("Anfrage fehlgeschlagen: " . mysql_error());
+        
         echo 'Erstelle Tabelle für Benutzer <br />';
         $query = "CREATE TABLE ".PREFIX."users (
             ID              int           AUTO_INCREMENT PRIMARY KEY,
@@ -86,6 +95,7 @@
  define("PREFIX", "'.$_POST['dbprefix'].'");
  define("BASEDIR", "'.$_POST['basedir'].'");
  define("PASSSALT", "'.$_POST['passsalt'].'");
+ define("VISITSALT", "'.$_POST['visitsalt'].'");
  define("EVENT", "'.$_POST['event'].'");
 ?>';
         
@@ -110,6 +120,7 @@
         echo $_POST['dbprefix'] . '<br />';
         echo $_POST['basedir'] . '<br />';
         echo $_POST['passsalt'] . '<br />';
+        echo $_POST['visitsalt'] . '<br />';
         echo $_POST['event'] . '<br />';
         echo $_POST['user'] . '<br />';
         
@@ -124,6 +135,7 @@
             <p>Datenbank-Präfix<br /><input name="dbprefix" type="text" size="30" maxlength="120" value="livetick_" /></p>
             <p>Verzeichnis auf Webserver<br /><input name="basedir" type="text" size="30" maxlength="120" value="/livetick" /></p>
             <p>Passwort-Salt<br /><input name="passsalt" type="text" size="30" maxlength="120" value="d78ea1ad4c75af2123391fce7da0c374" /></p>
+            <p>Visits-Salt<br /><input name="visitsalt" type="text" size="30" maxlength="120" value="9a158ed0cb479a75d0b0f83bb8508900" /></p>
             <p>Event<br /><input name="event" type="text" size="30" maxlength="120" value="SP-Sitzung vom 01.01.1970" /></p>
             <div class="control-group">
                 <label class="control-label" for="inputUser">Benutzername</label>

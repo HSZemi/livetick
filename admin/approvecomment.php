@@ -8,6 +8,8 @@ $conn = db_connect();
 
 if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
     header("Location: login.php");
+    db_close($conn);
+    die();
 }
 
 if(isset($_GET['approveid'])){
