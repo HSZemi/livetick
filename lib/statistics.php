@@ -213,9 +213,89 @@ function data_last_hours($count){
 	return $out;
 }
 
-function print_visitor_chart($id, $hours){
+function labels_last_days($count){
+	$count = intval($count);
+	// calculate timestamp mod 10
+	$time = time();
+	$timestamp = date('Y-m-d', $time);
+	
+	$oneday = date_interval_create_from_date_string('1 day');
+	
+	$labels = Array();
+	
+	$timestamp = date_create($timestamp);
+	
+	for($i = $count; $i >= 0; $i = $i - 1){
+		$labels[$i] = date_format($timestamp, "Y-m-d");
+		$timestamp = date_sub($timestamp, $oneday);
+	}
+	
+	$out = "labels: ['";
+	for($i = 0; $i < $count; $i = $i + 1){
+		$out .= $labels[$i]."','";
+	}
+	$out .= $labels[$count]."'],\n";
+	return $out;
+}
+
+function data_last_days($count){
+	$count = intval($count);
+	$time = time();
+	$timestamp = date('Y-m-d', $time);
+	
+	$oneday = date_interval_create_from_date_string('1 day');
+	
+	$stamps = Array();
+	
+	$timestamp = date_create($timestamp);
+	
+	for($i = $count; $i >= 0; $i = $i - 1){
+		$stamps[$i] = date_format($timestamp, "Y-m-d");
+		$timestamp = date_sub($timestamp, $oneday);
+	}
+	
+	$visitors = Array();
+	
+	$query = "SELECT date(timestamp) AS date, COUNT(DISTINCT visitor) AS count FROM livetickspbn_visits WHERE timestamp >= '".$stamps[0]."' GROUP BY year(timestamp), month(timestamp), day(timestamp) ORDER BY date ASC";
+	$result = mysql_query($query) or die("data_last_days: Anfrage 1 fehlgeschlagen: " . mysql_error());
+	
+	$index = 0;
+      while($row = mysql_fetch_array($result)){
+		$ts    = $row['date'];
+		$r_count = $row['count'];
+		
+		while($stamps[$index] != $ts){
+			$visitors[$index] = 0;
+			$index = $index + 1;
+		} 
+		$visitors[$index] = intval($r_count);
+		$index = $index + 1;
+      }
+      
+      for(; $index <= $count; $index = $index + 1){
+		$visitors[$index] = 0;
+      }
+	
+	
+	$out = "data: ['";
+	for($i = 0; $i < $count; $i = $i + 1){
+		$out .= $visitors[$i]."','";
+	}
+	$out .= $visitors[$count]."'],\n";
+	return $out;
+}
+
+function print_visitor_chart($id, $count, $type="hours"){
+	if($type === "days"){
+		$labels = labels_last_days($count);
+		$data = data_last_days($count);
+	} else {
+		$labels = labels_last_hours($count);
+		$data = data_last_hours($count);
+	}
+	
 	$id = intval($id);
-	$hours = intval($hours);
+	$count = intval($count);
 	echo "<canvas id='visitorChart_$id' height='400' width='800'></canvas>\n";
 	echo "<script type='text/javascript'>\n";
 	echo '	//Get context with jQuery - using jQuerys .get() method.
@@ -224,19 +304,21 @@ function print_visitor_chart($id, $hours){
 	var myVisitorChart = new Chart(ctx_'.$id.');';
 	
 	echo '	var data_'.$id.' = {
-		'.labels_last_hours($hours).'
+		'.$labels.'
 		datasets : [
 			{
 				fillColor : "rgba(220,220,220,0.5)",
 				strokeColor : "rgba(220,220,220,1)",
 				pointColor : "rgba(220,220,220,1)",
 				pointStrokeColor : "#fff",
-				'.data_last_hours($hours).'
+				'.$data.'
 			}
 		]
 	}
 	
 	';
+	
+	($type === "days") ? $scaleStepWidth = '5' : $scaleStepWidth = '1';
 	
 	echo '	var options_'.$id.' = {
 				
@@ -250,7 +332,7 @@ function print_visitor_chart($id, $hours){
 		//Number - The number of steps in a hard coded scale
 		scaleSteps : 20,
 		//Number - The value jump in the hard coded scale
-		scaleStepWidth : 1,
+		scaleStepWidth : '. $scaleStepWidth .',
 		//Number - The scale starting value
 		scaleStartValue : 0,
 

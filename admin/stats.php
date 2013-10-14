@@ -79,6 +79,9 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
 	
 	<h3>Letzte 6 Stunden</h3>
 	<?php print_visitor_chart(2, 6); ?>
+	
+	<h3>Letzte 30 Tage</h3>
+	<?php print_visitor_chart(3, 30, "days"); ?>
   </div>
   </div>
   
