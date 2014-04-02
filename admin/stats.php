@@ -39,6 +39,7 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
             <li><a href="post.php" target="_self"><i class="icon-pencil"></i> Beitrag erstellen</a></li>
             <li><a href="comments.php" target="_self"><i class="icon-comment"></i> Kommentare (<?php echo number_of_unapproved_comments(); ?>)</a></li>
             <li><a href="../index.php" target="_blank"><i class="icon-arrow-right"></i> Ticker ansehen</a></li>
+            <li><a href="events.php" target="_self"><i class="icon-glass"></i> Events</a></li>
             <li><a href="user.php" target="_self"><i class="icon-user"></i> Benutzerverwaltung</a></li>
             <li class="active"><a href="stats.php" target="_self"><i class="icon-align-left"></i> Statistik</a></li>
             <li><a href="logout.php" target="_self"><i class="icon-off"></i> Abmelden (<?php echo $_SESSION['user'] ?>)</a></li>

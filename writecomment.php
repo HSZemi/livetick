@@ -1,3 +1,12 @@
+<?php
+
+include 'lib/config.php';
+include 'lib/db.php';
+include 'lib/post-mgmt.php';
+include 'lib/event-mgmt.php';
+include 'lib/statistics.php';
+
+?>
 <!DOCTYPE html>
 <html>
  <head>
@@ -21,10 +30,7 @@
         
         
         <?php
-        
-        include 'lib/db.php';
-        include 'lib/post-mgmt.php';
-        
+                
         $conn = db_connect();
         
         $error = false;
@@ -36,7 +42,7 @@
             $comment = $_POST['comment'];
             $captcha = $_POST['kaptscha'];
 
-            if(strcasecmp($captcha,'Penz') != 0){
+            if(strcasecmp($captcha,'Fengler') != 0){
                   $captchaerror = true;
             } elseif(substr_count($email, '@', 1) != 1) {
                   $error = true;
@@ -80,7 +86,7 @@
             <textarea class="span6" rows="3" id="inputComment" name="comment"></textarea>
             
             <label class="control-label" for="inputKaptscha">Sicherheitsfrage: Hier den Nachnamen des SP-Präsidenten eingeben</label>
-            <input type="text" id="inputKaptscha" name="kaptscha" placeholder="der heißt nämlich Marco ****">
+            <input type="text" id="inputKaptscha" name="kaptscha" placeholder="der heißt nämlich Michael *******">
 
             
             <p>Zusätzlich wird intern noch deine aktuelle IP-Adresse gespeichert.</p>

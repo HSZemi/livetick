@@ -25,6 +25,7 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
   <?php
     include '../lib/db.php';
     include '../lib/post-mgmt.php';
+    include '../lib/event-mgmt.php';
     
     $conn = db_connect();
     
@@ -44,13 +45,20 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
         }
     }
     
-    if(isset($content)){
+    if(!isset($_SESSION['event_id'])){
+	$_SESSION['event_id'] = get_last_event();
+    }
+    if(isset($_POST['event'])){
+	$_SESSION['event_id'] = $_POST['event'];
+    }
+    
+    if(isset($content) and $content != ''){
         
         
         if(isset($id_p)){ // Post aktualisieren
             update_post($id_p, $content);
         } else {          // neuen Post erstellen
-            create_post($content, $_SESSION['user_id']);
+            create_post($content, $_SESSION['user_id'], $_SESSION['event_id']);
         }
         
        
@@ -65,6 +73,7 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
             <li class="active"><a href="post.php" target="_self"><i class="icon-pencil"></i> Beitrag erstellen</a></li>
             <li><a href="comments.php" target="_self"><i class="icon-comment"></i> Kommentare (<?php echo number_of_unapproved_comments(); ?>)</a></li>
             <li><a href="../index.php" target="_blank"><i class="icon-arrow-right"></i> Ticker ansehen</a></li>
+            <li><a href="events.php" target="_self"><i class="icon-glass"></i> Events</a></li>
             <li><a href="user.php" target="_self"><i class="icon-user"></i> Benutzerverwaltung</a></li>
             <li><a href="stats.php" target="_self"><i class="icon-align-left"></i> Statistik</a></li>
             <li><a href="logout.php" target="_self"><i class="icon-off"></i> Abmelden (<?php echo $_SESSION['user'] ?>)</a></li>
@@ -104,10 +113,14 @@ if(!isset($_SESSION['user_id']) or $_SESSION['user_id'] < 0){
                         print_post_content_with_id($modify_id);
                         
                     }
-                    echo '</textarea>';
-                ?>
-                <br />
-                <button class="btn btn-primary" type="submit">Senden</button>
+                    echo '</textarea>
+                    <br />
+                    
+                    <button class="btn btn-primary" type="submit">Senden</button> 
+                    ';
+                    print_event_select($_SESSION['event_id']);
+                    
+                    ?>
             </form>
         </div>
         

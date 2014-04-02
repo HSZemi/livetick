@@ -32,6 +32,16 @@ body {
     }
 }
 
+.eventselect{
+	margin-top: 8px;
+}
+
+.selectedevent{
+	background-color: #ffa;
+	padding: 8px;
+	border-radius: 4px;
+}
+
 #updates {
     /*background-color: #00ffff;*/
 }

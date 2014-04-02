@@ -1,3 +1,34 @@
+<?php
+
+include 'lib/config.php';
+include 'lib/db.php';
+include 'lib/event-mgmt.php';
+include 'lib/post-mgmt.php';
+include 'lib/statistics.php';
+
+$conn = db_connect();
+
+$event_id = 0;
+if(isset($_GET['id'])){
+	$id = intval($_GET['id']);
+	$event_id = get_event_id_for_post_id($id);
+}elseif(isset($_GET['event'])){
+	$event_id = intval($_GET['event']);
+	$comment_event_id = $event_id;
+	$event_url_addon = "'&event=$event_id'";
+} else {
+	$comment_event_id = null;
+	$event_id = get_last_event();
+	$event_url_addon = "''";
+}
+
+$event_info = get_event_info_by_id($event_id);
+$event_info ? $event_name 	= $event_info['name'] 		: $event_name 	= '-';
+$event_info ? $event_short 	= $event_info['short'] 		: $event_short 	= '-';
+$event_info ? $event_date 	= $event_info['date'] 		: $event_date 	= '-';
+$event_info ? $event_infoline	= $event_info['infoline'] 	: $event_infoline	= '-';
+
+?>
 <!DOCTYPE html>
 <html>
  <head>
@@ -17,16 +48,19 @@
     <script src="js/bootstrap.min.js"></script>
 
     <div class="container">
-        <?php include 'header.php' ?>
+	<div id="header">
+		<h4>livetick - simple liveticker application</h4>
+
+		<h1><a href="<?php echo BASEDIR; ?>/index.php">Liveticker zur SP-Sitzung</a></h1>
+		
+		<h5><?php echo $event_name .' - '. $event_date; ?></h5>
+		
+		 <?php echo $event_infoline; ?> | <a href="<?php echo BASEDIR; ?>/archiv.php" title="Archiv">Alle Liveticker</a><span class="visible-phone"><a href="<?php echo BASEDIR; ?>/comments.php" title="Letzte Kommentare">Letzte Kommentare</a></span>
+	</div>
         
         
         <?php
         
-        include 'lib/db.php';
-        include 'lib/post-mgmt.php';
-        include 'lib/statistics.php';
-        
-        $conn = db_connect();
         
         if(isset($_GET['id'])){
                 $singleid = $_GET['id'];
@@ -34,7 +68,8 @@
                 echo print_single_post($singleid);
                 register_visit($_SERVER['REMOTE_ADDR']);
         } else {
-            echo '<div id="options">
+        
+        echo '<div id="options">
 
         <button id="b_load" class="btn">Neue Posts laden</button>
         <button id="b_toggle_auto" class="btn btn-primary">Automatische Aktualisierung: AN</button>
@@ -44,7 +79,7 @@
         
         <div id="latest_comments" class="pull-right well hidden-phone">
         <h4>Letzte Kommentare:</h4>';
-        print_list_of_last_comments(20, false);
+        print_list_of_last_comments(20, false, $comment_event_id);
         echo '</div>
         
         <div id="updates" style="border:none; background-color: none;"> </div>
@@ -53,7 +88,7 @@
 
         
         ';
-            echo print_posts_since(0, false);
+            echo print_posts_of_event($event_id, false);
             
             echo '<div class="span12"><a name=bottom href="#top">Nach Oben ↑</a></div>';
         }
@@ -102,12 +137,12 @@
 
         function loadContent()
         {
-            $.get('getpostssince.php?id=' + last_post_id, function(data) {
+            $.get('getpostssince.php?id=' + last_post_id + <?php echo $event_url_addon;?>, function(data) {
                   var new_max = data.split("\n", 1);
                   last_post_id = parseInt(new_max[0]);
                   $('#updates').prepend(data.slice(new_max[0].length + 1));
             });
-            $.get('lastcomments.php?id=' + last_comment_id, function(data) {
+            $.get('lastcomments.php?id=' + last_comment_id + <?php echo $event_url_addon;?>, function(data) {
                   if(!(data=="")){
                         var new_max = data.split("\n", 1);
                         last_comment_id = parseInt(new_max[0]);

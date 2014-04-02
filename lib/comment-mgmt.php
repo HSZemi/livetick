@@ -180,17 +180,38 @@ function print_list_of_comments($approved = 'all'){
 }
 
 // print short list of last comments for frontpage
-function print_list_of_last_comments($count, $admin = false){
-      $query = "SELECT * FROM ".PREFIX."comments";
-      if(!$admin){
-            $query .= " WHERE approved = 1";
+function print_list_of_last_comments($count, $admin = false, $event = null){
+	if($event == null){
+		$query = "SELECT * FROM ".PREFIX."comments";
+      
+		if(!$admin){
+			$query .= " WHERE approved = 1";
+		}
+      } else {
+		$event_id = intval($event);
+		$query = "SELECT ".PREFIX."comments.ID AS ID, 
+					".PREFIX."comments.timestamp AS timestamp, 
+					".PREFIX."comments.ip AS ip, 
+					".PREFIX."comments.email AS email, 
+					".PREFIX."comments.username AS username, 
+					".PREFIX."comments.content AS content, 
+					".PREFIX."comments.entry AS entry, 
+					".PREFIX."comments.approved AS approved 
+				FROM ".PREFIX."comments 
+					JOIN ".PREFIX."entries 
+					ON ".PREFIX."comments.entry = ".PREFIX."entries.ID
+				WHERE ".PREFIX."entries.event = $event_id";
+      
+		if(!$admin){
+			$query .= " AND ".PREFIX."comments.approved = 1";
+		}
       }
       $query .= " ORDER BY ID DESC LIMIT " . intval($count);
       
       $result = mysql_query($query) or die("list_last_comments: Anfrage fehlgeschlagen: " . mysql_error());
       
       // HTML output
-
+	$has_comments = false;
       while($row = mysql_fetch_array($result)){
             $id         = $row['ID'];
             $timestamp  = $row['timestamp'];
@@ -201,6 +222,8 @@ function print_list_of_last_comments($count, $admin = false){
             $entry      = $row['entry'];
             $approved   = $row['approved'];
             
+            $has_comments = true;
+            
             // bugfix for wrong server time
             $date = date_create($timestamp);
             $time = date_format(date_sub($date, date_interval_create_from_date_string('4 minutes')), "H:i");
@@ -209,6 +232,10 @@ function print_list_of_last_comments($count, $admin = false){
             ($admin) ? $class = "text-warning" : $class = "";
             
             echo "<p class='$class'>$username zu <a href='".BASEDIR."/index.php?id=$entry'>#$entry</a> um <abbr title='$fulltime'>$time Uhr</abbr></p>\n";
+      }
+      
+      if(!$has_comments){
+		echo 'Keine Kommentare vorhanden.';
       }
 }
 

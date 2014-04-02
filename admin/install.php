@@ -96,7 +96,6 @@
  define("BASEDIR", "'.$_POST['basedir'].'");
  define("PASSSALT", "'.$_POST['passsalt'].'");
  define("VISITSALT", "'.$_POST['visitsalt'].'");
- define("EVENT", "'.$_POST['event'].'");
 ?>';
         
         fwrite($file, $filecontent);

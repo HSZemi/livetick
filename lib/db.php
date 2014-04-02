@@ -20,7 +20,7 @@ function db_connect(){
 	$query = "set names 'utf8';";
       $result = mysql_query($query);
       if(!$result){
-            echo "create_post: Anfrage fehlgeschlagen: " . mysql_error() . "<br/>";
+            echo "set names 'utf8': Anfrage fehlgeschlagen: " . mysql_error() . "<br/>";
       }
 	
 	

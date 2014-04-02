@@ -1,6 +1,7 @@
 <?php
   include 'lib/db.php';
   include 'lib/comment-mgmt.php';
+  include 'lib/event-mgmt.php';
   $conn = db_connect();
   if(isset($_GET['id'])){
       $id = $_GET['id'];
